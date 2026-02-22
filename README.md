@@ -97,7 +97,21 @@ Choose one of three ways to run FileFlash:
 
 Perfect for development and testing.
 
+**Mac/Linux:**
 ```bash
+# Clone the repository
+git clone https://github.com/ketan-16/fileflash.git
+cd fileflash
+
+# Install dependencies with uv
+uv sync
+
+# Run the development server
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Windows (PowerShell):**
+```powershell
 # Clone the repository
 git clone https://github.com/ketan-16/fileflash.git
 cd fileflash
@@ -115,6 +129,7 @@ Open [http://localhost:8000](http://localhost:8000) in your browser.
 
 For custom deployments and self-hosted setups.
 
+**Mac/Linux:**
 ```bash
 # Clone the repository
 git clone https://github.com/ketan-16/fileflash.git
@@ -131,6 +146,23 @@ docker run -d \
   fileflash
 ```
 
+**Windows (PowerShell):**
+```powershell
+# Clone the repository
+git clone https://github.com/ketan-16/fileflash.git
+cd fileflash
+
+# Build the image
+docker build -t fileflash .
+
+# Run with volume mount for persistent storage
+docker run -d `
+  -p 8000:8000 `
+  -v C:\path\to\files:/app/data/files `
+  --name fileflash `
+  fileflash
+```
+
 Optionally use `docker-compose.yml` for a simpler setup:
 ```bash
 docker-compose up -d
@@ -140,6 +172,7 @@ docker-compose up -d
 
 Fastest way to get started — no building required.
 
+**Mac/Linux:**
 ```bash
 # Pull the latest image from Docker Hub
 docker pull ketan16/fileflash
@@ -149,6 +182,19 @@ docker run -d \
   -p 8000:8000 \
   -v /path/to/files:/app/data/files \
   --name fileflash \
+  ketan16/fileflash
+```
+
+**Windows (PowerShell):**
+```powershell
+# Pull the latest image from Docker Hub
+docker pull ketan16/fileflash
+
+# Run the container
+docker run -d `
+  -p 8000:8000 `
+  -v C:\path\to\files:/app/data/files `
+  --name fileflash `
   ketan16/fileflash
 ```
 
@@ -386,6 +432,7 @@ FileFlash is **intentionally unauthenticated** and designed for **trusted local 
 
 ### Project Setup
 
+**Mac/Linux:**
 ```bash
 # Clone and enter directory
 git clone <repo>
@@ -398,17 +445,46 @@ uv sync
 source .venv/bin/activate
 ```
 
+**Windows (PowerShell):**
+```powershell
+# Clone and enter directory
+git clone <repo>
+cd fileflash
+
+# Create virtual environment with uv
+uv sync
+
+# Activate environment
+.venv\Scripts\Activate.ps1
+```
+
 ### Running Examples
 
+**Mac/Linux:**
 ```bash
+# Development with auto-reload
+uv run uvicorn main:app --reload
+
+# With Swagger docs enabled
+ENABLE_DOCS=true uv run uvicorn main:app --reload
+
+# Custom file root
+FILES_ROOT=/tmp/files uv run uvicorn main:app --reload
+
+# Production (no reload, optimized)
+uv run uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+```
+
+**Windows (PowerShell):**
+```powershell
 # Development with auto-reload
 uv run uvicorn app.main:app --reload
 
 # With Swagger docs enabled
-ENABLE_DOCS=true uv run uvicorn app.main:app --reload
+$env:ENABLE_DOCS="true"; uv run uvicorn app.main:app --reload
 
 # Custom file root
-FILES_ROOT=/tmp/files uv run uvicorn app.main:app --reload
+$env:FILES_ROOT="C:\temp\files"; uv run uvicorn app.main:app --reload
 
 # Production (no reload, optimized)
 uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
@@ -451,9 +527,18 @@ The entire stack is minimal by design—only 3 production dependencies!
 ## 🐛 Troubleshooting
 
 ### "Permission denied" on data/files
+
+**Mac/Linux:**
 ```bash
 # Ensure directory is writable
 chmod 755 data/files
+```
+
+**Windows (PowerShell):**
+```powershell
+# Right-click folder → Properties → Security → Edit
+# Or use icacls to modify permissions
+icacls "data\files" /grant:r "%username%:(OI)(CI)F"
 ```
 
 ### Service worker not updating
@@ -470,9 +555,18 @@ navigator.serviceWorker.getRegistrations().then(regs =>
 - Verify disk space on FILES_ROOT
 
 ### Docker permission issues
+
+**Mac/Linux:**
 ```bash
 # Run with user ID matching your user
 docker run --user $(id -u):$(id -g) -v /path/to/files:/app/data/files fileflash
+```
+
+**Windows (PowerShell):**
+```powershell
+# Ensure Docker Desktop is running and volume is accessible
+# Windows typically doesn't require user ID specification
+docker run -v C:\path\to\files:/app/data/files fileflash
 ```
 
 ---
@@ -515,7 +609,10 @@ For bugs, feature requests, or questions:
 
 **Network Discovery**
 - Use your computer's IP (e.g., `192.168.1.100:8000`) to access from mobile devices
-- Find your IP: `hostname -I` (Linux/Mac) or `ipconfig` (Windows)
+- Find your IP:
+  - **Linux:** `hostname -I`
+  - **Mac:** `ifconfig | grep "inet "` (or System Preferences → Network)
+  - **Windows:** `ipconfig` (look for IPv4 Address)
 
 **Reverse Proxy** (for authentication/SSL)
 ```nginx

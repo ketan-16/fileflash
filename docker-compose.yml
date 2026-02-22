@@ -4,7 +4,7 @@ services:
   web:
     image: ketan16/fileflash
     ports:
-      - "8000:8085"
+      - "8000:8000"
     volumes:
       - fileflash_data:/app/data
     environment:
