@@ -1,0 +1,21 @@
+[project]
+name = "file-share"
+version = "0.1.0"
+description = "Compact FastAPI shared drive with offline-capable PWA frontend"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.129.2",
+    "python-multipart>=0.0.20",
+    "uvicorn>=0.41.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=8.4.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

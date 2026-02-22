@@ -1,0 +1,18 @@
+{
+  "name": "FileFlash",
+  "short_name": "FileFlash",
+  "description": "Fast LAN file sharing with offline queue replay and media previews.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#e2e8f0",
+  "icons": [
+    {
+      "src": "/static/icons/fileflash-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

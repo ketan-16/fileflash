@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="FileFlash logo">
+  <defs>
+    <linearGradient id="ff-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="ff-bolt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="url(#ff-bg)"/>
+  <path d="M74 80c0-7 6-13 13-13h54l17 18h41c7 0 13 6 13 13v78c0 7-6 13-13 13H87c-7 0-13-6-13-13Z" fill="#f8fafc" opacity="0.9"/>
+  <path d="M142 99 106 144h25l-17 40 50-62h-26l16-23z" fill="url(#ff-bolt)"/>
+</svg>

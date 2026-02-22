@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#e2e8f0" />
+    <title>FileFlash</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-800">
+    <main class="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
+      <section class="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <header class="flex flex-col gap-4 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div class="flex items-center gap-3">
+            <img src="/static/icons/fileflash-logo.svg" alt="FileFlash logo" class="h-10 w-10 shrink-0" />
+            <div>
+              <h1 class="text-2xl font-semibold tracking-tight text-slate-900">FileFlash</h1>
+              <p class="mt-1 text-sm text-slate-600">Fast LAN file sharing with offline queue replay.</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="connectionBadge" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Online</span>
+            <span id="queueBadge" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-medium text-slate-700">0 pending</span>
+          </div>
+        </header>
+
+        <section class="space-y-4 p-4 sm:p-6">
+          <div id="offlineBanner" class="hidden rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+            Offline mode enabled. Actions are queued and synced when connection returns.
+          </div>
+
+          <form id="uploadForm" class="grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+            <input
+              id="fileInput"
+              type="file"
+              required
+              class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-slate-700"
+            />
+            <button
+              id="uploadButton"
+              type="submit"
+              class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+            >
+              Upload
+            </button>
+            <button
+              id="refreshButton"
+              type="button"
+              class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+            >
+              Refresh
+            </button>
+          </form>
+
+          <div id="uploadProgress" class="hidden rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div class="mb-1 flex items-center justify-between text-xs text-slate-600">
+              <p id="uploadProgressLabel" class="truncate">Uploading...</p>
+              <p id="uploadProgressPercent">0%</p>
+            </div>
+            <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+              <div id="uploadProgressBar" class="h-full w-0 rounded-full bg-slate-900 transition-[width] duration-150"></div>
+            </div>
+          </div>
+
+          <div id="staleBadge" class="hidden rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+            Showing cached file list.
+          </div>
+
+          <div class="hidden overflow-hidden rounded-xl border border-slate-200 lg:block">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+              <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th class="px-4 py-3">Name</th>
+                  <th class="px-4 py-3">Size</th>
+                  <th class="px-4 py-3">Updated</th>
+                  <th class="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="fileTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+            </table>
+          </div>
+
+          <div id="fileCardList" class="space-y-3 lg:hidden"></div>
+
+          <p id="emptyState" class="hidden rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+            No files uploaded yet.
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <section
+      id="renameModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="renameTitle"
+    >
+      <div class="w-full max-w-md rounded-xl border border-slate-200 bg-white p-5 shadow-lg">
+        <h2 id="renameTitle" class="text-lg font-semibold text-slate-900">Rename file</h2>
+        <form id="renameForm" class="mt-4 space-y-4">
+          <input id="renameCurrent" type="hidden" />
+          <div>
+            <label for="renameInput" class="mb-1 block text-sm font-medium text-slate-700">New filename</label>
+            <input
+              id="renameInput"
+              type="text"
+              required
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700"
+            />
+          </div>
+          <div class="flex justify-end gap-2">
+            <button type="button" id="renameCancel" class="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700">Cancel</button>
+            <button type="submit" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white">Save</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section
+      id="previewModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="previewTitle"
+    >
+      <div class="flex max-h-[88vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+        <header class="flex items-start justify-between gap-3 border-b border-slate-200 p-4">
+          <div>
+            <h2 id="previewTitle" class="text-lg font-semibold text-slate-900">Preview</h2>
+            <p id="previewFilename" class="mt-0.5 text-xs text-slate-600"></p>
+          </div>
+          <button id="previewClose" type="button" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">
+            Close
+          </button>
+        </header>
+
+        <div id="previewBody" class="min-h-72 flex-1 overflow-auto bg-slate-950 p-4 text-slate-100"></div>
+
+        <footer id="previewPdfControls" class="hidden items-center justify-center gap-3 border-t border-slate-200 bg-slate-50 p-3">
+          <button id="previewPdfPrev" type="button" class="rounded-md border border-slate-300 px-3 py-1.5 text-xs text-slate-700 hover:bg-white">
+            Previous
+          </button>
+          <span id="previewPdfPage" class="text-xs text-slate-600">Page 1 / 1</span>
+          <button id="previewPdfNext" type="button" class="rounded-md border border-slate-300 px-3 py-1.5 text-xs text-slate-700 hover:bg-white">
+            Next
+          </button>
+        </footer>
+      </div>
+    </section>
+
+    <div id="toast" class="pointer-events-none fixed bottom-4 left-1/2 hidden -translate-x-1/2 rounded-lg bg-slate-900 px-4 py-2 text-sm text-white shadow-lg"></div>
+
+    <script type="module" src="/static/app.js"></script>
+  </body>
+</html>
