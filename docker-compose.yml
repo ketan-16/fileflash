@@ -1,0 +1,15 @@
+version: "1.0"
+
+services:
+  web:
+    image: ketan16/fileflash
+    ports:
+      - "8000:8085"
+    volumes:
+      - fileflash_data:/app/data
+    environment:
+      ENV: production
+    restart: unless-stopped
+
+volumes:
+  fileflash_data:
